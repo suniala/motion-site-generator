@@ -19,6 +19,9 @@ $content
 ''')
 
 TMPL_DAYS = Template('''
+<div>
+<a href="..">takaisin</a>
+</div>
 <ul>
 $items
 </ul>
@@ -89,7 +92,7 @@ def parse_archive(path):
 
 def render_root_index(archive):
     return TMPL_PAGE.substitute(
-        title='Arkisto',
+        title='Kuva-arkisto',
         content=TMPL_DAYS.substitute(
             items=''.join(
                 TMPL_DAY.substitute(url=day['day'], label=day['day']) for
