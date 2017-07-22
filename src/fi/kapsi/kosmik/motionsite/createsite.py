@@ -1,12 +1,9 @@
 # coding=utf-8
-import StringIO
-from os import walk, makedirs
+from optparse import OptionParser
 from os import listdir
+from os import makedirs
 from os.path import isfile, join, relpath, exists
 from string import Template
-
-TEST_SOURCE = '/home/kosmik/projektit/koodaus/oravakamera/kuvat'
-TEST_TARGET = '/home/kosmik/projektit/koodaus/oravakamera/arkisto'
 
 TMPL_PAGE = Template('''
 <html>
@@ -156,8 +153,22 @@ def write_site(site_path, archive_root_path, archive):
 
 
 def main():
-    archive = parse_archive(TEST_SOURCE)
-    write_site(TEST_TARGET, TEST_SOURCE, archive)
+    parser = OptionParser()
+    parser.add_option("-o", "--output",
+                      dest="output_path",
+                      help="output directory")
+    parser.add_option("-i", "--input",
+                      dest="input_path",
+                      help="input directory")
+
+    (options, args) = parser.parse_args()
+
+    if not options.input_path or not options.output_path:
+        parser.print_help()
+        exit(2)
+
+    archive = parse_archive(options.input_path)
+    write_site(options.output_path, options.input_path, archive)
 
 
 if __name__ == '__main__':
