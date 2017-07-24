@@ -5,6 +5,8 @@ from os import makedirs
 from os.path import isfile, join, relpath, exists
 from string import Template
 
+EVENT_PREVIEW_COUNT = 3
+
 TMPL_PAGE = Template('''
 <html>
 <head>
@@ -44,9 +46,13 @@ TMPL_EVENT = Template('''
 <div>
 <h2>$label</h2>
 <a href="$event_url">
-  <img src="$img_url" style="width: 320px;" />
+$pictures
 </a>
 </div>
+''')
+
+TMPL_EVENT_PIC = Template('''
+<img src="$img_url" style="width: 320px;" />
 ''')
 
 TMPL_PICTURES = Template('''
@@ -101,6 +107,10 @@ def render_root_index(archive):
 
 
 def render_day_index(site_path, archive_root_path, day):
+    def gen(event, count):
+        for picture in event['pictures'][:count]:
+            yield (event, picture)
+
     return TMPL_PAGE.substitute(
         title='Päivä %s' % (day['day']),
         content=TMPL_EVENTS.substitute(
@@ -108,8 +118,13 @@ def render_day_index(site_path, archive_root_path, day):
                 TMPL_EVENT.substitute(
                     label='Tapahtuma %s (%d kuvaa)' % (event['event'], len(event['pictures'])),
                     event_url=event['event'],
-                    img_url=relpath(join(archive_root_path, day['day'], event['event'], event['pictures'][0]),
-                                    join(site_path, day['day']))
+                    pictures=''.join(
+                        TMPL_EVENT_PIC.substitute(
+                            img_url=relpath(join(archive_root_path, day['day'], event['event'], picture),
+                                            join(site_path, day['day']))
+                        )
+                        for picture in event['pictures'][:EVENT_PREVIEW_COUNT]
+                    )
                 )
                 for event in day['events'])
         ))
