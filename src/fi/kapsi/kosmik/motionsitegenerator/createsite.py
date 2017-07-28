@@ -85,7 +85,7 @@ def parse_archive(path):
 
         for event_name in event_names:
             event_path = join(day_path, event_name)
-            picture_names = [f for f in listdir(event_path) if isfile(join(event_path, f))]
+            picture_names = [f for f in listdir(event_path) if isfile(join(event_path, f)) and f.endswith('.jpg')]
             picture_names.sort()
 
             if picture_names:
